@@ -41,6 +41,12 @@ body {
   outline: 2px solid Cornsilk;
 }
 
+.celda.encontrada {
+  background: MediumSeaGreen;
+  color: white;
+  font-weight: bold;
+}
+
 #resultado {
   margin-top: 2rem;
   font-size: 1rem;
@@ -58,14 +64,22 @@ body {
 }
 
 /* botón de pista */
-#pista-btn {
+#pista-btn,
+#validar-btn {
   position: fixed;
   bottom: 1rem;
-  right: 1rem;
   padding: 0.5rem 1rem;
   background: black;
   color: white;
   border: none;
   font-weight: bold;
   cursor: pointer;
+}
+
+#pista-btn {
+  right: 1rem;
+}
+
+#validar-btn {
+  right: 5rem; /* para que no se solapen */
 }
