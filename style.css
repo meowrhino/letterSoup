@@ -1,0 +1,42 @@
+body {
+    font-family: serif;
+    background: MediumPurple;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100dvw;
+    height: 100dvh;
+
+    color: gainsboro;
+}
+
+#sopa {
+  display: grid;
+  grid-template-columns: repeat(10, 2em);
+  justify-content: center;
+  align-items: center;
+  gap: 0.2rem;
+  background: DimGray;
+  padding: 1rem;
+}
+
+.celda {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: DimGray;
+  user-select: none;
+}
+
+.celda.seleccionada {
+  background: wheat;
+  color: darkblue;
+}
+
+#resultado {
+  margin-top: 2rem;
+  font-size: 1rem;
+}
