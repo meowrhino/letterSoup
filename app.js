@@ -2,6 +2,10 @@ const sopa = document.getElementById("sopa");
 const resultado = document.getElementById("resultado");
 const TAM = 10;
 
+let mouseIsDown = false;
+let clickStart = null;
+let startCell = null;
+
 let direccionFija = null; // para bloquear la dirección en drag
 
 let tablero = Array.from({ length: TAM }, () =>
@@ -104,18 +108,20 @@ function renderTablero() {
       celda.dataset.x = x;
       celda.dataset.letra = letra;
 
-      // 🎯 DRAG INICIO
-      celda.addEventListener("mousedown", () => {
-        dragging = true;
+      // MOUSEDOWN (posible inicio de drag)
+      celda.addEventListener("mousedown", (e) => {
+        mouseIsDown = true;
+        clickStart = { x: e.clientX, y: e.clientY };
         seleccion = [{ y, x, letra, celda }];
         seleccionManual = letra;
         direccionFija = null;
         celda.classList.add("seleccionada");
       });
 
-      // 🎯 DRAG CONTINUACIÓN
+      // MOUSEENTER (durante drag)
       celda.addEventListener("mouseenter", () => {
-        if (!dragging) return;
+        if (!mouseIsDown) return;
+
         const yaSeleccionada = seleccion.find((s) => s.y === y && s.x === x);
         if (yaSeleccionada) return;
 
@@ -123,10 +129,13 @@ function renderTablero() {
         const dx = x - ultima.x;
         const dy = y - ultima.y;
 
+        // Definir dirección en la segunda celda
         if (!direccionFija && seleccion.length === 1) {
-          if (dx !== 0 && dy === 0) direccionFija = { dx: Math.sign(dx), dy: 0 }; // horizontal
-          else if (dy !== 0 && dx === 0) direccionFija = { dx: 0, dy: Math.sign(dy) }; // vertical
-          else return; // bloquear diagonales
+          if (dx !== 0 && dy === 0)
+            direccionFija = { dx: Math.sign(dx), dy: 0 };
+          else if (dy !== 0 && dx === 0)
+            direccionFija = { dx: 0, dy: Math.sign(dy) };
+          else return;
         }
 
         if (
@@ -140,24 +149,57 @@ function renderTablero() {
         }
       });
 
-      // 🛑 DRAG FIN
-      celda.addEventListener("mouseup", () => {
-        dragging = false;
-      });
-
-      // 🖱️ CLICK INDIVIDUAL
-      celda.addEventListener("click", () => {
-        if (dragging) return;
-
-        const index = seleccion.findIndex((s) => s.y === y && s.x === x);
-        if (index === -1) {
-          seleccion.push({ y, x, letra, celda });
-          celda.classList.add("seleccionada");
-        } else {
-          seleccion.splice(index, 1);
-          celda.classList.remove("seleccionada");
+      // CLICK (selección por clic individual, SIN interferencia con dragging)
+      celda.addEventListener("click", (e) => {
+        // 1) si venimos de un drag, ignoramos este click
+        if (dragging) {
+          dragging = false;
+          return;
+        }
+        // 2) si es el primer click simple (ya añadida por mousedown), la dejamos
+        if (
+          seleccion.length === 1 &&
+          seleccion[0].y === y &&
+          seleccion[0].x === x
+        ) {
+          // sólo actualizamos la cadena manual por si la usas en UI
+          seleccionManual = seleccion[0].letra;
+          return;
         }
 
+        const yaSeleccionada = seleccion.find((s) => s.y === y && s.x === x);
+        if (yaSeleccionada) {
+          // quitar selección si ya está clicada
+          seleccion = seleccion.filter((s) => !(s.y === y && s.x === x));
+          celda.classList.remove("seleccionada");
+        } else {
+          if (seleccion.length === 0) {
+            direccionFija = null;
+            seleccion.push({ y, x, letra, celda });
+            celda.classList.add("seleccionada");
+          } else {
+            const ultima = seleccion[seleccion.length - 1];
+            const dx = x - ultima.x;
+            const dy = y - ultima.y;
+
+            if (!direccionFija && seleccion.length === 1) {
+              if (dx !== 0 && dy === 0)
+                direccionFija = { dx: Math.sign(dx), dy: 0 };
+              else if (dy !== 0 && dx === 0)
+                direccionFija = { dx: 0, dy: Math.sign(dy) };
+              else return;
+            }
+
+            if (
+              direccionFija &&
+              Math.sign(dx) === direccionFija.dx &&
+              Math.sign(dy) === direccionFija.dy
+            ) {
+              seleccion.push({ y, x, letra, celda });
+              celda.classList.add("seleccionada");
+            }
+          }
+        }
         seleccionManual = seleccion.map((c) => c.letra).join("");
       });
 
@@ -165,9 +207,18 @@ function renderTablero() {
     }
   }
 
-  // 🧼 Soltar fuera del tablero
-  document.addEventListener("mouseup", () => {
-    dragging = false;
+  // MOUSEUP global: determinar si fue drag o solo clic
+  document.addEventListener("mouseup", (e) => {
+    mouseIsDown = false;
+
+    if (clickStart) {
+      const dx = Math.abs(e.clientX - clickStart.x);
+      const dy = Math.abs(e.clientY - clickStart.y);
+      dragging = dx > 5 || dy > 5; // esto solo sirve para diagnóstico si quieres
+      clickStart = null;
+    } else {
+      dragging = false;
+    }
   });
 }
 
