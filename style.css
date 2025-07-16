@@ -37,8 +37,13 @@ body {
   color: darkblue;
 }
 
+@keyframes pistaParpadeo {
+  0%, 100% { background-color: DimGray; }
+  50% { background-color: Cornsilk; }
+}
+
 .celda.pista {
-  outline: 2px solid Cornsilk;
+  animation: pistaParpadeo 1s infinite;
 }
 
 .celda.encontrada {
@@ -82,4 +87,13 @@ body {
 
 #validar-btn {
   right: 5rem; /* para que no se solapen */
+}
+
+@keyframes parpadeo {
+  0%, 100% { background-color: crimson; color: white; }
+  50% { background-color: black; color: crimson; }
+}
+
+.celda.error {
+  animation: parpadeo 0.4s ease-in-out 2;
 }
