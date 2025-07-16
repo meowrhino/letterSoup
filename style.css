@@ -2,6 +2,7 @@ body {
     font-family: serif;
     background: MediumPurple;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100dvw;
@@ -12,9 +13,9 @@ body {
 
 #sopa {
   display: grid;
-  grid-template-columns: repeat(10, 2em);
-  justify-content: center;
-  align-items: center;
+  grid-template-columns: repeat(auto-fit, 2em); /* se adapta */
+
+
   gap: 0.2rem;
   background: DimGray;
   padding: 1rem;
@@ -36,7 +37,35 @@ body {
   color: darkblue;
 }
 
+.celda.pista {
+  outline: 2px solid Cornsilk;
+}
+
 #resultado {
   margin-top: 2rem;
   font-size: 1rem;
+  text-align: center;
+}
+
+#resultado a {
+    text-decoration: none;
+    font-weight: bold;
+    color: Goldenrod;
+}
+
+#resultado a:hover {
+    color: DarkGoldenrod;
+}
+
+/* botón de pista */
+#pista-btn {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  background: black;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
 }
